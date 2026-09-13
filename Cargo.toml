@@ -1,0 +1,62 @@
+[package]
+name = "domain-modeling-in-rust"
+version = "0.1.0"
+edition = "2024"
+publish = false
+autobins = false
+
+[[bin]]
+name = "ex00"
+path = "exercises/00-get-started.rs"
+
+[[bin]]
+name = "ex01"
+path = "exercises/01-spot-the-problem.rs"
+
+[[bin]]
+name = "ex02"
+path = "exercises/02-model-order-state.rs"
+
+[[bin]]
+name = "ex03"
+path = "exercises/03-put-data-where-it-belongs.rs"
+
+[[bin]]
+name = "ex04"
+path = "exercises/04-model-valid-transitions.rs"
+
+[[bin]]
+name = "ex05"
+path = "exercises/05-protect-the-domain.rs"
+
+[[bin]]
+name = "solution01"
+path = "solutions/01-spot-the-problem.rs"
+
+[[bin]]
+name = "solution02"
+path = "solutions/02-model-order-state.rs"
+
+[[bin]]
+name = "solution03"
+path = "solutions/03-put-data-where-it-belongs.rs"
+
+[[bin]]
+name = "solution04"
+path = "solutions/04-model-valid-transitions.rs"
+
+[[bin]]
+name = "solution05"
+path = "solutions/05-protect-the-domain.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "typestate"
+path = "bonus/01-generic-typestate.rs"
+
+[[bin]]
+name = "json-boundary"
+path = "bonus/02-json-boundary.rs"
