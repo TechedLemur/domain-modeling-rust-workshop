@@ -1,9 +1,6 @@
 {
   "name": "Rust Domain Modeling Workshop",
   "image": "mcr.microsoft.com/devcontainers/rust:latest",
-  "features": {
-    "ghcr.io/devcontainers/features/git-lfs:1": {}
-  },
   "customizations": {
     "vscode": {
       "extensions": [

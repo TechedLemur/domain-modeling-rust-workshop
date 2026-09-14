@@ -18,8 +18,8 @@ validation are available if you finish early or want to explore further afterwar
 
 ## Start in GitHub Codespaces
 
-On the repository's GitHub page, select **Code → Codespaces → Create codespace**.
-Wait for the development container setup to finish, then open a terminal.
+On the repository's GitHub page, select **Use this template → Open in a codespace**.
+Wait for the development container setup to finish.
 Rust and the editor extensions are configured automatically; no local installation
 is needed. Setup builds all exercise and solution binaries.
 
