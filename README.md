@@ -26,6 +26,30 @@ is needed. Setup builds all exercise and solution binaries.
 Open [exercise 0](exercises/00-get-started.rs), wait for Rust Analyzer to
 finish loading, and click **Run** above `fn main()`.
 
+## Run locally
+
+Prefer your own editor? You can run the workshop without a development container:
+
+1. Install Rust using [rustup](https://rustup.rs/), which includes Cargo.
+2. Clone this repository and open its folder in your editor. For VS Code,
+   install the **rust-analyzer** extension for code assistance and Run/Test actions.
+3. From the repository root, download dependencies and check the setup:
+
+   ```sh
+   cargo build --bins
+   ```
+
+Open [exercise 0](exercises/00-get-started.rs) and click **Run** above `main`,
+or use the terminal:
+
+```sh
+cargo run --bin ex00
+```
+
+To run an exercise's tests, use its target name, for example
+`cargo test --bin ex02`. Some exercises contain `todo!()` placeholders, so running
+them or their tests may fail until you complete them.
+
 ## Exercises
 
 Each exercise is a single Rust file with its own starting point. Read its comments
@@ -78,7 +102,7 @@ small challenge. Click **Run** above `main` or **Run Tests** above `mod tests`.
 | JSON and domain validation | [02-json-boundary.rs](bonus/02-json-boundary.rs)         | `cargo run --bin json-boundary` |
 
 Use `cargo test --bin typestate --bin json-boundary` to check both examples.
-Cargo downloads Serde automatically during Codespaces setup.
+Cargo downloads Serde automatically during Codespaces setup or your first local build.
 
 ## Repository layout
 
