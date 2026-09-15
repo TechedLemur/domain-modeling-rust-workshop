@@ -1,6 +1,12 @@
 // Solution 1: Spot the problem
 //
-// This model compiles, but it allows orders that break our business rules.
+// Imagine we're building an order system. We need to track whether an order
+// has been paid and shipped, along with its payment and tracking information.
+// Using booleans and optional fields seems reasonable, but what combinations
+// does that let us create?
+//
+// Rust checks each field's type, but these types don't express the rules that
+// connect the fields. Let's find orders that compile but shouldn't exist.
 //
 // Rules:
 // - An order must be paid before shipping.
@@ -8,10 +14,10 @@
 // - Shipped orders need a tracking number; unshipped orders cannot have one.
 //
 // Task: create two more orders that compile but break these rules.
-// Click Run above main and explain which rule each order breaks. There are no tests.
+// Click Run above `main` and explain which rule each order breaks. There are no tests.
 // Keep the supplied IDs; they identify orders as their states change.
 //
-// Option<String> holds either Some("value".to_string()) or None (no value).
+// `Option<String>` holds either `Some("value".to_string())` or `None` (no value).
 
 #[derive(Debug)]
 #[allow(dead_code)] // Hide warnings about unused fields.
@@ -37,7 +43,7 @@ fn main() {
         id: "456".to_string(),
         is_paid: true,
         is_shipped: true,
-        // Missing both payment_id and tracking_number
+        // Missing both `payment_id` and `tracking_number`
         payment_id: None,
         tracking_number: None,
     };

@@ -6,21 +6,21 @@
 //
 // Imagine receiving a payment confirmation as JSON. Its payment ID might be
 // missing, be a number instead of text, or contain text in the wrong format.
-// This example shows where we catch each problem, using the validated PaymentId
+// This example shows where we catch each problem, using the validated `PaymentId`
 // idea from exercise 5.
 //
 // We use Serde, a library for reading and writing Rust values in data formats.
-// serde_json provides JSON support. Deriving Deserialize generates the code
-// to read PaymentInput. There are two steps:
-// 1. Parse JSON into PaymentInput: are the required fields strings?
-// 2. Convert it into Payment: does the payment ID have the required format?
+// `serde_json` provides JSON support. Deriving `Deserialize` generates the code
+// to read `PaymentInput`. There are two steps:
+// 1. Parse JSON into `PaymentInput`: are the required fields strings?
+// 2. Convert it into `Payment`: does the payment ID have the required format?
 // Notice that parsing can succeed while domain validation still fails.
 //
-// Click Run above main or Run Tests above mod tests.
+// Click Run above `main` or Run Tests above `mod tests`.
 // Optional tasks:
-// - Remove payment_id, change it to a number, or give it a bad format.
+// - Remove `payment_id`, change it to a number, or give it a bad format.
 //   Compare the errors, then restore the examples.
-// - Reject blank order IDs in into_domain, including whitespace.
+// - Reject blank order IDs in `into_domain`, including whitespace.
 //   Add tests for the new rule.
 // Serde reference: https://serde.rs/derive.html
 
@@ -65,7 +65,7 @@ use payment_id::PaymentId;
 
 impl PaymentInput {
     fn into_domain(self) -> Result<Payment, String> {
-        // ? returns early on Err; otherwise it gives us the validated value.
+        // `?` returns early on `Err`; otherwise it gives us the validated value.
         let payment_id = PaymentId::new(self.payment_id)?;
         Ok(Payment {
             order_id: self.order_id,
@@ -81,13 +81,13 @@ enum ImportError {
 }
 
 fn import_payment(json: &str) -> Result<Payment, ImportError> {
-    // map_err wraps the error so callers can distinguish the two steps.
+    // `map_err` wraps the error so callers can distinguish the two steps.
     let input: PaymentInput = serde_json::from_str(json).map_err(ImportError::Json)?;
     input.into_domain().map_err(ImportError::Domain)
 }
 
 fn main() {
-    // r#"..."# lets us write JSON without escaping its quotation marks.
+    // `r#"..."#` lets us write JSON without escaping its quotation marks.
     for json in [
         r#"{"order_id":"order-123","payment_id":"payment-456"}"#,
         r#"{"order_id":"order-123"}"#,

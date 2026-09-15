@@ -9,6 +9,10 @@
         "tamasfe.even-better-toml"
       ],
       "settings": {
+        "github.copilot.enable": {
+          "*": false
+        },
+        "github.copilot.nextEditSuggestions.enabled": false,
         "editor.formatOnSave": true,
         "rust-analyzer.check.command": "clippy"
       }

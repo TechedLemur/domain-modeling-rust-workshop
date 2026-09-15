@@ -1,33 +1,40 @@
-// Click Run above main for the demo; Run Tests above mod tests checks all tests.
+// Click Run above `main` for the demo; Run Tests above `mod tests` checks all tests.
 // Use Run Test above a single test while working.
 
 #![allow(dead_code)]
 
 // Solution 3: Put data where it belongs
 //
+// We now have one order state, but a `Paid` order can still have no payment ID.
+// How can we make the state and its required information stay together?
+//
+// Enum variants can carry data of their own. `Paid { payment_id: String }`
+// requires a payment ID whenever we construct that variant. Matching on it
+// also lets us read that data. Here, `Order` keeps the shared ID while each
+// variant carries the information its state needs.
+//
 // Business rules:
 // - Created orders have no payment or tracking information.
 // - Paid orders require a payment ID.
 // - Shipped orders keep their payment ID and need a tracking number.
-// - Cancelled means before payment: no payment ID or tracking number.
+// - `Cancelled` means before payment: no payment ID or tracking number.
 //
-// Paid is already implemented. Use it as a guide for Shipped.
-// Order keeps its ID; each variant holds the data its state requires.
+// `Paid` is already implemented. Use it as a guide for `Shipped`.
 //
 // Tasks:
-// 1. Add the required fields to Shipped. Use Paid as a guide; do not use Option.
-// 2. Implement shipped_order using its arguments.
-// 3. Complete describe by matching the Shipped variant and reading its data.
+// 1. Add the required fields to `Shipped`. Use `Paid` as a guide; do not use `Option`.
+// 2. Implement `shipped_order` using its arguments.
+// 3. Complete `describe` by matching the `Shipped` variant and reading its data.
 //    Include the order ID, payment ID, tracking number, and the word "shipped".
-//    Follow the Paid example; choose your own wording.
+//    Follow the `Paid` example; choose your own wording.
 //
 // Done: tests pass and Shipped has required payment and tracking fields.
 //
 // Optional: add tracking_number(&Order) -> Option<&str> using match. Return a
-// tracking number only for shipped orders. Borrow the string with .as_str().
+// tracking number only for shipped orders. Borrow the string with `.as_str()`.
 // In the next exercise we restrict transitions between these states.
 
-// Includes the optional tracking_number helper and its tests.
+// Includes the optional `tracking_number` helper and its tests.
 
 #[derive(Debug)]
 struct Order {
@@ -48,7 +55,7 @@ enum OrderStatus {
     Cancelled,
 }
 
-// Construct Paid with its required payment ID.
+// Construct `Paid` with its required payment ID.
 fn paid_order(id: String, payment_id: String) -> Order {
     Order {
         id,
@@ -69,7 +76,7 @@ fn shipped_order(id: String, payment_id: String, tracking_number: String) -> Ord
 fn describe(order: &Order) -> String {
     match &order.status {
         OrderStatus::Created => format!("Order {} has been created", order.id),
-        // This pattern gives us the payment_id field.
+        // This pattern gives us the `payment_id` field.
         OrderStatus::Paid { payment_id } => {
             format!("Order {} was paid with {}", order.id, payment_id)
         }

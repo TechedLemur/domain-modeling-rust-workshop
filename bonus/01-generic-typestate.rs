@@ -1,27 +1,27 @@
 // Bonus 1: Generic typestate (advanced, optional)
 //
 // In exercise 4, separate types gave each order state its own allowed methods.
-// CreatedOrder could be paid, and PaidOrder could be shipped. That worked well,
+// `CreatedOrder` could be paid, and `PaidOrder` could be shipped. That worked well,
 // but each type declared the same order ID field.
 //
 // Could we share the common parts while still letting the compiler restrict
 // which methods are available? Here we explore another way to express the same
 // rules: one generic Order<State> type, with data and methods for each state.
-// Order<Created> replaces CreatedOrder; Order<Paid> replaces PaidOrder.
+// `Order<Created>` replaces `CreatedOrder`; `Order<Paid>` replaces `PaidOrder`.
 //
 // As you read, compare the two approaches. Notice which methods apply to every
 // state and which apply to just one. The business rules stay the same.
 //
-// Click Run above main or Run Tests above mod tests.
-// Try calling ship before pay, or using created after pay. Read the errors,
+// Click Run above `main` or Run Tests above `mod tests`.
+// Try calling `ship` before `pay`, or using `created` after `pay`. Read the errors,
 // then undo the changes. The same restrictions from exercise 4 still apply.
 // Optional: add Cancelled and cancel(self) only on Order<Created>. Test that the
 // order ID survives. Try cancelling a shipped order, then undo the experiment.
 
 mod order {
     // Generics let one definition work with different types.
-    // State is a type parameter, like T in Option<T>; the name is our choice.
-    // Order<Created> and Order<Paid> are different types built from this definition.
+    // `State` is a type parameter, like `T` in `Option<T>`; the name is our choice.
+    // `Order<Created>` and `Order<Paid>` are different types built from this definition.
     // You can read more about generics in the Rust Book: https://doc.rust-lang.org/book/ch10-01-syntax.html
     #[derive(Debug)]
     pub struct Order<State> {
@@ -43,20 +43,20 @@ mod order {
         tracking_number: String,
     }
 
-    // impl<State> introduces a type parameter: these methods work for any State.
+    // `impl<State>` introduces a type parameter: these methods work for any `State`.
     impl<State> Order<State> {
         pub fn id(&self) -> &str {
             &self.id
         }
     }
 
-    // Here Created is a specific type, so only Order<Created> gets these methods.
+    // Here `Created` is a specific type, so only `Order<Created>` gets these methods.
     impl Order<Created> {
         pub fn new(id: String) -> Self {
             Self { id, state: Created }
         }
 
-        // Return a different type: consume Order<Created> and build Order<Paid>.
+        // Return a different type: consume `Order<Created>` and build `Order<Paid>`.
         pub fn pay(self, payment_id: String) -> Order<Paid> {
             Order {
                 id: self.id,
@@ -65,7 +65,7 @@ mod order {
         }
     }
 
-    // Only Order<Paid> has ship; other states cannot call it.
+    // Only `Order<Paid>` has `ship`; other states cannot call it.
     impl Order<Paid> {
         pub fn ship(self, tracking_number: String) -> Order<Shipped> {
             Order {
@@ -92,8 +92,8 @@ mod order {
 use order::{Created, Order};
 
 fn main() {
-    // ::<Created> selects the state type when calling new.
-    // Try order::Shipped instead of Created; read the error, then undo the change.
+    // `::<Created>` selects the state type when calling `new`.
+    // Try `order::Shipped` instead of `Created`; read the error, then undo the change.
     let created = Order::<Created>::new("order-123".to_string());
     println!("Created {}", created.id());
     let paid = created.pay("payment-456".to_string());

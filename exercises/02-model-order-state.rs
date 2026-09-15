@@ -1,32 +1,40 @@
-// Click Run above main for the demo; Run Tests above mod tests checks all tests.
+// Click Run above `main` for the demo; Run Tests above `mod tests` checks all tests.
 // Use Run Test above a single test while working.
 
 #![allow(dead_code)]
 
 // Exercise 2: Model order state
 //
-// OrderStatus replaces the two flags with one state: created, paid, or shipped.
-// This removes the "shipped but unpaid" flag combination. The order keeps its ID.
+// In exercise 1, separate flags let us say an order was shipped but unpaid.
+// What if we represented its state as a single choice instead?
+//
+// An enum lists alternatives, called variants. An `OrderStatus` value is exactly
+// one of `Created`, `Paid`, or `Shipped`, so the conflicting flags are gone.
+// A `match` expression handles each alternative and produces a value. Each arm
+// uses `pattern => expression`; Rust checks that we cover every possibility.
+//
+// Let's use `match` to describe the states, then add another. The payment and
+// tracking fields are still separate; we'll explore what that leaves possible.
 //
 // Tasks:
-// 1. Complete describe_status. Use the Created match arm as a guide.
-//    Return "paid" and "shipped" for the other states. Name every variant;
-//    do not use a wildcard (_) arm. Run the tests.
-// 2. Add Cancelled to OrderStatus (cancellation before payment). Check the
-//    compiler error in describe_status, then handle it by returning "cancelled".
+// 1. Complete `describe_status` so the remaining arms return "paid" and
+//    "shipped". Run the tests.
+// 2. Add `Cancelled` to `OrderStatus` (cancellation before payment). Check the
+//    compiler error in `describe_status`, then handle it by returning "cancelled".
 //    Add a test for that case, following the existing tests.
-// 3. Create an order with status Paid and no payment ID in main.
-//    Why should a paid order require a payment ID, and why does this model allow None?
 //
-// Done: every state has an explicit match arm, all tests pass (including your
-// cancellation test), and you can explain the remaining invalid combination.
+// Done: all tests pass, including your new cancellation test.
+//
+// Before moving on: the state is now a single choice, but `payment_id` is still
+// optional. Can this model guarantee that every paid order has a payment ID?
+// We'll address this in exercise 3.
 
 #[derive(Debug, PartialEq)]
 enum OrderStatus {
     Created,
     Paid,
     Shipped,
-    // TODO (task 2): Add Cancelled after the existing tests pass.
+    // TODO (task 2): Add `Cancelled` after the existing tests pass.
 }
 
 #[derive(Debug)]
@@ -72,9 +80,6 @@ fn main() {
         println!("Order {} is {}", order.id, describe_status(&order.status));
     }
 
-    // Task 3: Create an order with status Paid and no payment ID.
-    // Order derives Debug, so print it with {:?}, for example:
-    // println!("{:?}", order);
 }
 
 #[cfg(test)]
@@ -96,5 +101,5 @@ mod tests {
         assert_eq!(describe_status(&OrderStatus::Shipped), "shipped");
     }
 
-    // TODO (task 2): Add a test for Cancelled after adding the variant.
+    // TODO (task 2): Add a test for `Cancelled` after adding the variant.
 }

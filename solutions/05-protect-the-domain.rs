@@ -1,30 +1,38 @@
 // Solution 5: Protect the domain
 //
-// The transitions are implemented, but public fields let callers skip them
-// and construct a paid or shipped order directly.
+// Our methods express the allowed transitions, but callers can still skip
+// them and construct a `PaidOrder` directly. How can we make callers go through
+// the methods instead?
+//
+// A module (`mod`) gives us a privacy boundary. Items and struct fields are
+// private by default; `pub` exposes selected parts. A public struct can keep
+// its fields private, so code outside the module must use its public methods
+// to create values or read their data. This is called encapsulation.
+//
+// Let's protect the `order` module and give callers one starting point:
+// `CreatedOrder::new`. Here, `new` is an associated function, called on the type
+// without an existing order, and `Self` means `CreatedOrder` inside its `impl`.
 //
 // Tasks:
-// 1. Click Run above main. The bypass constructs a paid order without calling pay.
-// 2. Remove pub from every struct field inside order. Keep the types and their
+// 1. Click Run above `main`. The bypass constructs a paid order without calling `pay`.
+// 2. Remove `pub` from every struct field inside `order`. Keep the types and their
 //    methods public so callers can use the API. Run again and inspect the
-//    privacy error. Then delete the marked bypass block, including its return.
-// 3. Implement CreatedOrder::new as the entry point for creating orders.
-//    Reach other states through pay, ship, or cancel. Keep all fields private.
-// 4. Click Run Tests above mod tests, then Run above main. Try changing an order's
-//    ID directly from main. Inspect the error, then undo that experiment.
+//    privacy error. Then delete the marked bypass block, including its `return`.
+// 3. Implement `CreatedOrder::new` as the entry point for creating orders.
+//    Reach other states through `pay`, `ship`, or `cancel`. Keep all fields private.
+// 4. Click Run Tests above `mod tests`, then Run above `main`. Try changing an order's
+//    ID directly from `main`. Inspect the error, then undo that experiment.
 //
-// Done: tests pass, main uses the API, and both direct field access and direct
-// construction from outside order fail. Tests alone do not prove encapsulation.
+// Done: tests pass, `main` uses the API, and both direct field access and direct
+// construction from outside `order` fail. Tests alone do not prove encapsulation.
 // This API records a supplied payment ID; it does not perform or verify payment.
 
-// Includes PaymentId; the optional TrackingNumber extension is not included.
-// The bypass is commented out so main runs through the public API.
+// Includes `PaymentId`; the optional `TrackingNumber` extension is not included.
+// The bypass is commented out so `main` runs through the public API.
 
 #![allow(dead_code)]
 
-// A module defines a privacy boundary. pub makes an item accessible outside it.
-// A public struct can have private fields. Its own module can still access them.
-// We use concrete state types to focus on construction. The wrapper Order enum
+// We use concrete state types to focus on construction. The wrapper `Order` enum
 // from exercise 4 can still be added when needed.
 mod order {
     // Keep the structs and their methods public.
@@ -52,8 +60,8 @@ mod order {
     }
 
     impl CreatedOrder {
-        // Call CreatedOrder::new(...) without an existing order.
-        // Self here means CreatedOrder.
+        // Call `CreatedOrder::new(...)` without an existing order.
+        // `Self` here means `CreatedOrder`.
         pub fn new(id: String) -> Self {
             CreatedOrder { id }
         }
@@ -107,7 +115,7 @@ mod order {
 
     // Optional: use PaymentId as a guide for implementing TrackingNumber.
     // Workshop rule: "payment-" followed by one or more digits 0–9.
-    // Result is either Ok(the value) or Err(the reason construction failed).
+    // `Result` is either `Ok(the value)` or `Err(the reason construction failed)`.
     #[derive(Debug, PartialEq)]
     pub struct PaymentId(String);
 
@@ -118,7 +126,7 @@ mod order {
                 None => return Err("Payment ID must start with payment-"),
             };
 
-            // all checks every byte; the empty check rejects "payment-" alone.
+            // `all` checks every byte; the empty check rejects "payment-" alone.
             if digits.is_empty() || !digits.bytes().all(|byte| byte.is_ascii_digit()) {
                 return Err("Payment ID must end with one or more digits 0-9");
             }
@@ -142,10 +150,10 @@ fn main() {
     // };
 
     let created = CreatedOrder::new("123".to_string());
-    // Private fields also prevent changing created.id directly.
+    // Private fields also prevent changing `created.id` directly.
     println!("Created order {}", created.id());
 
-    // This example value is valid; handle Err when accepting external input.
+    // This example value is valid; handle `Err` when accepting external input.
     let payment_id = PaymentId::new("payment-456".to_string()).unwrap();
 
     let shipped = created.pay(payment_id).ship("tracking-789".to_string());
@@ -159,11 +167,11 @@ fn main() {
     println!("Cancelled order {}", cancelled.id());
 }
 
-// Further practice: add a validated TrackingNumber type and use it in ship and
-// ShippedOrder. Update callers and add validation tests, following PaymentId.
+// Further practice: add a validated `TrackingNumber` type and use it in `ship` and
+// `ShippedOrder`. Update callers and add validation tests, following `PaymentId`.
 // Valid ID formats do not prove that a payment or shipment actually occurred.
 
-// These tests sit outside order, so they use the same public API as main.
+// These tests sit outside `order`, so they use the same public API as `main`.
 #[cfg(test)]
 mod tests {
     use super::order::{CreatedOrder, PaymentId};

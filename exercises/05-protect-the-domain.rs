@@ -1,27 +1,34 @@
 // Exercise 5: Protect the domain
 //
-// The transitions are implemented, but public fields let callers skip them
-// and construct a paid or shipped order directly.
+// Our methods express the allowed transitions, but callers can still skip
+// them and construct a `PaidOrder` directly. How can we make callers go through
+// the methods instead?
+//
+// A module (`mod`) gives us a privacy boundary. Items and struct fields are
+// private by default; `pub` exposes selected parts. A public struct can keep
+// its fields private, so code outside the module must use its public methods
+// to create values or read their data. This is called encapsulation.
+//
+// Let's protect the `order` module and give callers one starting point:
+// `CreatedOrder::new`. Here, `new` is an associated function, called on the type
+// without an existing order, and `Self` means `CreatedOrder` inside its `impl`.
 //
 // Tasks:
-// 1. Click Run above main. The bypass constructs a paid order without calling pay.
-// 2. Remove pub from every struct field inside order. Keep the types and their
-//    methods public so callers can use the API. Run again and inspect the
-//    privacy error. Then delete the marked bypass block, including its return.
-// 3. Implement CreatedOrder::new as the entry point for creating orders.
-//    Reach other states through pay, ship, or cancel. Keep all fields private.
-// 4. Click Run Tests above mod tests, then Run above main. Try changing an order's
-//    ID directly from main. Inspect the error, then undo that experiment.
+// 1. Click Run above `main`. The 'bypass' constructs a paid order without calling `pay`, which should not be allowed.
+// 2. Remove `pub` from every struct field inside the `order` module (you need to do this for each struct).
+//    Keep the types and their methods public so callers can use the API.
+//    Run again and inspect the privacy error. Then delete the marked 'bypass' block, including its `return`.
+// 3. Implement `CreatedOrder::new` as the entry point for creating orders.
+//    Reach other states through `pay`, `ship`, or `cancel`. Keep all fields private.
+// 4. Click Run Tests above `mod tests`, then Run above `main`. Try changing an order's
+//    ID directly from `main`. Inspect the error, then undo that experiment.
 //
-// Done: tests pass, main uses the API, and both direct field access and direct
-// construction from outside order fail. Tests alone do not prove encapsulation.
-// This API records a supplied payment ID; it does not perform or verify payment.
+// Done: tests pass, `main` uses the API, and both direct field access and direct
+// construction from outside the `order` module fail.
 
 #![allow(dead_code)]
 
-// A module defines a privacy boundary. pub makes an item accessible outside it.
-// A public struct can have private fields. Its own module can still access them.
-// We use concrete state types to focus on construction. The wrapper Order enum
+// We use concrete state types to focus on construction. The wrapper `Order` enum
 // from exercise 4 can still be added when needed.
 mod order {
     // TODO: Make all fields in these four order structs private.
@@ -50,8 +57,8 @@ mod order {
     }
 
     impl CreatedOrder {
-        // Call CreatedOrder::new(...) without an existing order.
-        // Self here means CreatedOrder.
+        // Construct a created order with the supplied ID
+        // (`Self` here means `CreatedOrder`).
         pub fn new(id: String) -> Self {
             todo!("Construct a created order with the supplied ID")
         }
@@ -105,7 +112,7 @@ mod order {
 
     // Optional: use PaymentId as a guide for implementing TrackingNumber.
     // Workshop rule: "payment-" followed by one or more digits 0–9.
-    // Result is either Ok(the value) or Err(the reason construction failed).
+    // `Result` is either `Ok(the value)` or `Err(the reason construction failed)`.
     #[derive(Debug, PartialEq)]
     pub struct PaymentId(String);
 
@@ -116,7 +123,7 @@ mod order {
                 None => return Err("Payment ID must start with payment-"),
             };
 
-            // all checks every byte; the empty check rejects "payment-" alone.
+            // `all` checks every byte; the empty check rejects "payment-" alone.
             if digits.is_empty() || !digits.bytes().all(|byte| byte.is_ascii_digit()) {
                 return Err("Payment ID must end with one or more digits 0-9");
             }
@@ -134,7 +141,7 @@ use order::{CreatedOrder, PaidOrder};
 
 fn main() {
     // Bypass block: remove this entire block after observing the privacy error.
-    // The early return skips the unfinished constructor. An unreachable-code
+    // The early `return` skips the unfinished constructor. An unreachable-code
     // warning below is expected until you remove this block.
     let bypass = PaidOrder {
         id: "bypass".to_string(),
@@ -145,7 +152,7 @@ fn main() {
     // End of bypass block.
 
     let created = CreatedOrder::new("123".to_string());
-    // Task 4: try created.id = "changed".to_string(); (make created mutable first).
+    // Task 4: try `created.id = "changed".to_string();` (make created mutable first).
     println!("Created order {}", created.id());
     let shipped = created
         .pay("payment-456".to_string())
@@ -161,19 +168,15 @@ fn main() {
 }
 
 // Optional: validated identifiers
-// Try this after the main task. Use PaymentId and its tests as a guide.
-// Ask for help if newtypes or Result are unfamiliar.
-// 1. Replace payment strings with PaymentId in fields and pay. Preserve the type
-//    through ship; use as_str() to read its text. Update main and tests.
-// 2. Add TrackingNumber for "tracking-" followed by one or more digits 0–9.
-//    Use it in fields and ship. Add tests for valid values and invalid formats.
-// 3. Try passing PaymentId to ship. Inspect the type error, then undo the change.
-// For valid example values: PaymentId::new("payment-456".to_string()).unwrap().
-// unwrap panics on Err; use match to handle invalid input.
-// Keep inner fields private and use validated constructors inside order too.
-// A valid format does not prove that a payment took place.
+// Try this after the main task. Use `PaymentId` and its tests as a guide.
+// Ask for help if newtypes or `Result` are unfamiliar.
+// 1. Replace payment strings with `PaymentId` in fields and `pay`. Preserve the type
+//    through `ship`; use `as_str()` to read its text. Update `main` and tests.
+// 2. Add `TrackingNumber` for "tracking-" followed by one or more digits 0–9.
+//    Use it in fields and `ship`. Add tests for valid values and invalid formats.
+// 3. Try passing `PaymentId` to `ship`. Inspect the type error, then undo the change.
 
-// These tests sit outside order, so they use the same public API as main.
+// These tests sit outside the `order` module, so they use the same public API as `main`.
 #[cfg(test)]
 mod tests {
     use super::order::CreatedOrder;
